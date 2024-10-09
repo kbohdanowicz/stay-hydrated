@@ -7,6 +7,6 @@
 
 ## Running on system startup
 - Create a shortcut to the `exe`
-- Open run menu `Ctrl + R`
+- Open run menu `Win + R`
 - Type `shell:startup`
 - Put the shortcut in the directory

@@ -1,0 +1,18 @@
+[package]
+name = "stay_hydrated"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rodio = "0.19.0"
+winapi = { version = "0.3", features = ["consoleapi", "wincon"] }
+clap = { version = "4.5.20", features = ["derive"] }
+
+# Specify the binary target
+[[bin]]
+name = "stay_hydrated"
+path = "src/main.rs"
+
+# Configure the Windows subsystem
+[profile.release]
+opt-level = "s" # This compresses the executable size

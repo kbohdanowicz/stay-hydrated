@@ -1,7 +1,5 @@
 # Stay Hydrated
 
----
-
 ## Install
 - Download `stay-hydrated.exe` and `bubble-popping.mp3` from [releases](https://github.com/kbohdanowicz/stay-hydrated/releases/)
 - Create the `res` directory in the directory of the `exe`

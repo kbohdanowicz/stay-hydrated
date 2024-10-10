@@ -1,4 +1,4 @@
-$binOldName = "stay_hydrated.exe"
+$binOldName = "stay-hydrated.exe"
 $binNewName = "Stay Hydrated.exe"
 
 $distPath = "target\release"

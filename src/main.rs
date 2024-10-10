@@ -6,6 +6,48 @@ use rodio::{source::Source, OutputStream};
 use std::{fs::File, io::BufReader, thread, time::Duration};
 use clap::{Parser};
 
+fn main() {
+    if cfg!(not(debug_assertions)) {
+        unsafe {
+            winapi::um::wincon::FreeConsole();
+        }
+    }
+
+    let args = Args::parse();
+
+    loop {
+        match play_sound(&args) {
+            Ok(_) => {
+                let duration = args.interval * 60;
+                thread::sleep(Duration::from_secs(duration))},
+            Err(e) => {
+                eprintln!("Error playing sound: {}", e);
+                thread::sleep(Duration::from_secs(2));
+            }
+        }
+    }
+}
+
+fn play_sound(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
+    let (_stream, handle) = OutputStream::try_default()?;
+    let sink = rodio::Sink::try_new(&handle)?;
+
+    sink.set_volume(args.volume);
+
+    let file = BufReader::new(File::open(&args.path)?);
+    let source = rodio::Decoder::new(file)?;
+
+    // ? Clone the source to allow repeated plays
+    let source = source.buffered();
+
+    sink.append(source.clone());
+
+    // ? Allow sound to play
+    thread::sleep(Duration::from_secs(2));
+
+    Ok(())
+}
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -15,29 +57,4 @@ struct Args {
     volume: f32,
     #[arg(short, long, default_value_t = 15)]
     interval: u64,
-}
-
-fn main() {
-    unsafe {
-        winapi::um::wincon::FreeConsole();
-    }
-
-    let args = Args::parse();
-
-    // Set up the audio stream
-    let (_stream, handle) = OutputStream::try_default().unwrap();
-    let sink = rodio::Sink::try_new(&handle).unwrap();
-
-    sink.set_volume(args.volume);
-
-    let file = BufReader::new(File::open(args.path).unwrap());
-    let source = rodio::Decoder::new(file).unwrap();
-
-    // Clone the source to allow repeated plays
-    let source = source.buffered();
-
-    loop {
-        sink.append(source.clone());
-        thread::sleep(Duration::from_secs(args.interval * 60));
-    }
 }

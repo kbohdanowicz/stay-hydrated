@@ -1,5 +1,5 @@
 [package]
-name = "stay_hydrated"
+name = "stay-hydrated"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,7 +10,7 @@ clap = { version = "4.5.20", features = ["derive"] }
 
 # Specify the binary target
 [[bin]]
-name = "stay_hydrated"
+name = "stay-hydrated"
 path = "src/main.rs"
 
 # Configure the Windows subsystem

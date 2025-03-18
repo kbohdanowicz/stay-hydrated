@@ -17,7 +17,8 @@ fn main() {
 
     let args = Args::parse();
 
-    let last_interaction_time = Arc::new(Mutex::new(Instant::now()));
+    let last_interaction_time =
+        Arc::new(Mutex::new(Instant::now()));
 
     {
         let last_interaction_time_clone = Arc::clone(&last_interaction_time);
@@ -81,7 +82,10 @@ fn main() {
 
         if last_sound_time.elapsed() >= sound_duration {
             // println!("Playing sound");
-            match play_sound(&args) {
+            match play_rest_start_sound(
+                &args.rest_start_sfx_path,
+                args.volume,
+            ) {
                 Ok(_) => {}
                 Err(e) => { eprintln!("Error playing sound: {}", e); }
             }
@@ -90,19 +94,23 @@ fn main() {
     }
 }
 
-fn play_sound(args: &Args)-> Result<(), Box<dyn std::error::Error>> {
+fn play_rest_start_sound(
+    path: &String,
+    volume: f32,
+) -> Result<(), Box<dyn std::error::Error>> {
     let (_stream, stream_handle) = OutputStream::try_default()?;
     let sink = Sink::try_new(&stream_handle)?;
 
-    sink.set_volume(args.volume);
+    sink.set_volume(volume);
 
-    let file = BufReader::new(File::open(&args.path)?);
+    let file = BufReader::new(File::open(path)?);
     let source = Decoder::new(file)?;
 
     // ? Clone the source to allow repeated plays
     let source = source.buffered();
 
     sink.append(source.clone());
+
     // ? Block until the sound finishes playing
     sink.sleep_until_end();
     Ok(())
@@ -112,7 +120,9 @@ fn play_sound(args: &Args)-> Result<(), Box<dyn std::error::Error>> {
 #[command(author, version, about, long_about = None)]
 struct Args {
     #[arg(short, long, default_value_t = String::from("./res/bubble-popping.mp3"))]
-    path: String,
+    rest_start_sfx_path: String,
+    // #[arg(short, long, default_value_t = String::from("./res/bubble-popping.mp3"))]
+    // rest_end_sfx_path: String,
     #[arg(short, long, default_value_t = 0.35)]
     volume: f32,
     #[arg(short, long, default_value_t = 30)]
